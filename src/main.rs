@@ -64,7 +64,8 @@ impl From<Vec<&str>> for Operation {
             return Operation::Pong(vec![
                 "*1".to_string(),
                 "$4".to_string(),
-                "pong".to_string()
+                "PONG".to_string(),
+                "".to_string()
             ]);
         }
 
