@@ -62,7 +62,6 @@ impl From<Vec<&str>> for Operation {
     fn from(mut data: Vec<&str>) -> Self {
         if data == &["*1", "$4", "ping"] {
             return Operation::Pong(vec![
-                "*1".to_string(),
                 "$4".to_string(),
                 "PONG".to_string(),
                 "".to_string()
