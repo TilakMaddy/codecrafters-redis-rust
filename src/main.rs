@@ -26,10 +26,13 @@ fn handle_connection(mut stream: TcpStream) {
     let _request = buf_reader.read_line(&mut data)
         .expect("Couldn't read from buffer !");
 
-
     println!("[Recv] : {}", data);
 
-    let binding = craft_response(data);
+    // As of now, we dont care what we receive
+    let binding = craft_response(
+        "*1\r\n$4\r\nping\r\n".to_string()
+    );
+
     write!(stream, "{}", binding).expect("panic message");
 
     println!("[Sent] : {}", binding);
