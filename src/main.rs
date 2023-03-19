@@ -32,8 +32,7 @@ fn handle_connection(mut stream: TcpStream) {
 
     let binding = craft_response(data);
     let response = binding.as_bytes();
-    stream.write(response)
-        .expect("Couldn't reply to client !");
+    write!(stream, response).expect("panic message");
 
     println!("[Sent] : {}", String::from_utf8_lossy(response));
 }
