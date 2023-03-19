@@ -43,6 +43,7 @@ fn craft_response(request_string: String) -> String {
 
     if let Some(message) = decomposed {
         if message.1.len() == 0 {
+
             return default_response;
         }
         let size = message.1.as_bytes().len();
