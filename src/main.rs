@@ -1,7 +1,5 @@
-use std::io::{BufReader, Read, Write};
+use std::io::{BufRead, BufReader, Write};
 use std::net::{TcpListener, TcpStream};
-use std::ptr::replace;
-use anyhow::Result;
 
 fn main() {
     println!("Logs from your program will appear here!");
@@ -25,15 +23,16 @@ fn handle_connection(mut stream: TcpStream) {
     let mut buf_reader = BufReader::new(&stream);
 
     let mut data = String::new();
-    let _request = buf_reader.read_to_string(&mut data)
+    let _request = buf_reader.read_line(&mut data)
         .expect("Couldn't read from buffer !");
 
-    //println!("[Recv] : {}", data);
+
+    println!("[Recv] : {}", data);
 
     let binding = craft_response(data);
     write!(stream, "{}", binding).expect("panic message");
 
-    //println!("[Sent] : {}", binding);
+    println!("[Sent] : {}", binding);
 }
 
 fn craft_response(request_string: String) -> String {
