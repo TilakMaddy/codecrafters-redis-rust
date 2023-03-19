@@ -28,12 +28,12 @@ fn handle_connection(mut stream: TcpStream) {
     let _request = buf_reader.read_to_string(&mut data)
         .expect("Couldn't read from buffer !");
 
-    println!("[Recv] : {}", data);
+    //println!("[Recv] : {}", data);
 
     let binding = craft_response(data);
     write!(stream, "{}", binding).expect("panic message");
 
-    println!("[Sent] : {}", binding);
+    //println!("[Sent] : {}", binding);
 }
 
 fn craft_response(request_string: String) -> String {
