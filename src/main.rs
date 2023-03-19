@@ -31,10 +31,9 @@ fn handle_connection(mut stream: TcpStream) {
     println!("[Recv] : {}", data);
 
     let binding = craft_response(data);
-    let response = binding.as_bytes();
-    write!(stream, response).expect("panic message");
+    write!(stream, "{}", binding).expect("panic message");
 
-    println!("[Sent] : {}", String::from_utf8_lossy(response));
+    println!("[Sent] : {}", binding);
 }
 
 fn craft_response(request_string: String) -> String {
