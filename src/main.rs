@@ -1,5 +1,6 @@
 use std::io::{BufRead, BufReader, Write};
 use std::net::{TcpListener, TcpStream};
+use std::thread;
 
 fn main() {
     println!("Logs from your program will appear here!");
@@ -10,7 +11,7 @@ fn main() {
         match stream {
             Ok(tcp_stream) => {
                 println!("accepted new connection");
-                handle_connection(tcp_stream);
+                thread::spawn(|| handle_connection(tcp_stream));
             }
             Err(e) => {
                 println!("error: {}", e);
@@ -19,23 +20,24 @@ fn main() {
     }
 }
 
-fn handle_connection(mut stream: TcpStream) {
-    let mut buf_reader = BufReader::new(&stream);
+fn handle_connection(stream: TcpStream) {
+    let buf_reader = BufReader::new(&stream);
+    let client_addr = stream.local_addr().unwrap().ip().to_string();
 
-    let mut data = String::new();
-    let _request = buf_reader.read_line(&mut data)
-        .expect("Couldn't read from buffer !");
-
-    println!("[Recv] : {}", data);
-
-    // As of now, we dont care what we receive
+    // As of now, we don't care what we receive so we hard code input
     let binding = craft_response(
         "*1\r\n$4\r\nping\r\n".to_string()
     );
 
-    write!(stream, "{}", binding).expect("panic message");
+    let mut reading_iterator =
+        buf_reader.lines()
+        .map(|line| line.unwrap());
 
-    println!("[Sent] : {}", binding);
+    while let Some(_) = reading_iterator.next() {
+        write!(&stream, "{}", &binding).expect(&*format!(
+            "Couldn't send back response to {}", client_addr
+        ));
+    }
 }
 
 fn craft_response(request_string: String) -> String {
@@ -124,8 +126,6 @@ mod tests {
         ));
 
     }
-
-
 
 }
 
