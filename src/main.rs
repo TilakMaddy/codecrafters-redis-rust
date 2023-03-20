@@ -31,16 +31,24 @@ fn handle_connection(stream: TcpStream) {
 
     let mut reading_iterator =
         buf_reader.lines()
-        .map(|line| line.unwrap());
+            .map(|line| line.unwrap());
 
-    println!("{}", binding);
-
-    while let Some(_) = reading_iterator.next() {
+    let mut count = 0;
+    while let Some(x) = reading_iterator.next() {
+        if x.is_empty() {
+            break;
+        }
         // do nothing
+        count += 1;
     }
-    write!(&stream, "{}", &binding).expect(&*format!(
-        "Couldn't send back response to {}", client_addr
-    ));
+
+    println!("Done reading !");
+
+    for _ in 0..count {
+        write!(&stream, "{}", &binding).expect(&*format!(
+            "Couldn't send back response to {}", client_addr
+        ));
+    }
 }
 
 fn craft_response(request_string: String) -> String {
