@@ -29,7 +29,8 @@ fn handle_connection(stream: TcpStream) {
             println!("client closed the connection");
             break;
         }
-        stream.write("+PONG\r\n".as_bytes()).unwrap();
+        write!(stream, "+PONG\r\n").expect("Couldn't write into stream !");
+        // stream.write("+PONG\r\n".as_bytes()).unwrap();
     }
 }
 
