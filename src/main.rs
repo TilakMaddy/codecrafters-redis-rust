@@ -37,9 +37,7 @@ fn handle_connection(stream: TcpStream) {
         if x.is_empty() {
             break;
         }
-        write!(&stream, "{}", &binding).expect(&*format!(
-            "Couldn't send back response to {}", client_addr
-        ));
+        tcp_stream.write("+PONG\r\n".as_bytes()).unwrap();
     }
 
 }
