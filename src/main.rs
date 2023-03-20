@@ -1,4 +1,4 @@
-use std::io::{BufRead, BufReader, Write};
+use std::io::{BufRead, BufReader, Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::thread;
 
@@ -21,25 +21,16 @@ fn main() {
 }
 
 fn handle_connection(stream: TcpStream) {
-    let buf_reader = BufReader::new(&stream);
-    let client_addr = stream.local_addr().unwrap().ip().to_string();
-
-    // As of now, we don't care what we receive so we hard code input
-    let binding = craft_response(
-        "*1\r\n$4\r\nping\r\n".to_string()
-    );
-
-    let mut reading_iterator =
-        buf_reader.lines()
-            .map(|line| line.unwrap());
-
-    while let Some(x) = reading_iterator.next() {
-        if x.is_empty() {
+    let mut stream  = stream;
+    let mut buf = [0; 512];
+    loop {
+        let bytes_read = stream.read(&mut buf).unwrap();
+         if bytes_read == 0 {
+            println!("client closed the connection");
             break;
         }
-        tcp_stream.write("+PONG\r\n".as_bytes()).unwrap();
+        stream.write("+PONG\r\n".as_bytes()).unwrap();
     }
-
 }
 
 fn craft_response(request_string: String) -> String {
