@@ -36,10 +36,11 @@ fn handle_connection(stream: TcpStream) {
     println!("{}", binding);
 
     while let Some(_) = reading_iterator.next() {
-        write!(&stream, "{}\r\n", &binding).expect(&*format!(
-            "Couldn't send back response to {}", client_addr
-        ));
+        // do nothing
     }
+    write!(&stream, "{}", &binding).expect(&*format!(
+        "Couldn't send back response to {}", client_addr
+    ));
 }
 
 fn craft_response(request_string: String) -> String {
