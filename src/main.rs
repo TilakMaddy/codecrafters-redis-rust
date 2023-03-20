@@ -33,8 +33,10 @@ fn handle_connection(stream: TcpStream) {
         buf_reader.lines()
         .map(|line| line.unwrap());
 
+    println!("{}", binding);
+
     while let Some(_) = reading_iterator.next() {
-        write!(&stream, "{}", &binding).expect(&*format!(
+        write!(&stream, "{}\r\n", &binding).expect(&*format!(
             "Couldn't send back response to {}", client_addr
         ));
     }
