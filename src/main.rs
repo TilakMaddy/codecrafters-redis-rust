@@ -23,6 +23,7 @@ fn main() {
 fn handle_connection(stream: TcpStream) {
     let mut stream  = stream;
     let mut buf = [0; 512];
+    
     loop {
         let bytes_read = stream.read(&mut buf).unwrap();
          if bytes_read == 0 {
