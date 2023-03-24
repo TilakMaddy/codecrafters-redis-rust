@@ -1,12 +1,12 @@
-use std::io::Cursor;
 use bytes::{Buf, Bytes};
+use std::io::Cursor;
 
 #[derive(Debug, Clone)]
 pub enum Frame {
     Simple(String),
     Bulk(Bytes),
     Integer(i64),
-    Array(Vec<Frame>)
+    Array(Vec<Frame>),
 }
 
 impl Frame {
@@ -16,19 +16,15 @@ impl Frame {
         match repr_char {
             b'+' => {
                 let bytes_vec = get_line(buf).to_vec();
-                let simple_str = String::from_utf8(bytes_vec)
-                    .expect("failed to parse UTF-8 encoded strings ");
+                let simple_str =
+                    String::from_utf8(bytes_vec).expect("failed to parse UTF-8 encoded strings ");
 
                 return Frame::Simple(simple_str);
             }
-            b':' => {
-                return Frame::Integer(get_u64(buf) as i64)
-            }
+            b':' => return Frame::Integer(get_u64(buf) as i64),
             b'$' => {
                 let len = get_u64(buf);
-                let data = Bytes::copy_from_slice(
-                    get_bytes(buf, len as usize)
-                );
+                let data = Bytes::copy_from_slice(get_bytes(buf, len as usize));
                 buf.advance((len + 2) as usize);
                 return Frame::Bulk(data);
             }
@@ -42,7 +38,7 @@ impl Frame {
 
                 return Frame::Array(out);
             }
-            _ => unimplemented!()
+            _ => unimplemented!(),
         }
     }
 
@@ -52,21 +48,40 @@ impl Frame {
             Frame::Bulk(s) => {
                 let s = String::from_utf8(s.to_vec()).unwrap();
                 format!("${}\r\n{}\r\n", s.chars().count(), s)
-            },
+            }
             _ => panic!("value encode not implemented for: {:?}", self),
         }
     }
 
+    pub fn unwrap_bulk(&self) -> Bytes {
+        if let Frame::Bulk(b) = self {
+            return b.clone();
+        }
+        panic!("Trying to unwrap_bulk on a Frame that doesn't conform to Frame::Bulk");
+    }
+
+    pub fn unwrap_bulk_as_string(&self) -> String {
+        let b = self.unwrap_bulk();
+        let value_str = String::from_utf8(b.to_vec()).unwrap();
+        return value_str;
+    }
+
+    pub fn unwrap_array(self) -> Vec<Frame> {
+        if let Frame::Array(vf) = self {
+            return vf;
+        }
+        panic!("Trying to unwrap_bulk on a Frame that doesn't conform to Frame::Bulk");
+    }
 }
 
-fn get_bytes<'a>(buf: &mut Cursor<&'a [u8]>, n: usize) -> &'a [u8]{
+fn get_bytes<'a>(buf: &mut Cursor<&'a [u8]>, n: usize) -> &'a [u8] {
     // n is the length of the bulk string
     let start = buf.position() as usize;
     let end = start + n;
     return &buf.get_ref()[start..end];
 }
 
-fn get_line<'a>(buf: &mut Cursor<&'a [u8]>) -> &'a [u8]{
+fn get_line<'a>(buf: &mut Cursor<&'a [u8]>) -> &'a [u8] {
     // scan the buffer directly
     // search from start, scan through max_end, stop if you find CRLF
     let start = buf.position() as usize;
@@ -85,10 +100,10 @@ fn get_line<'a>(buf: &mut Cursor<&'a [u8]>) -> &'a [u8]{
 
 fn get_u64(buf: &mut Cursor<&[u8]>) -> u64 {
     let bytes_vec = get_line(buf).to_vec();
-    let u64_str = String::from_utf8(bytes_vec)
-        .expect("failed to parse UTF-8 encoded strings ");
+    let u64_str = String::from_utf8(bytes_vec).expect("failed to parse UTF-8 encoded strings ");
 
-    let decimal =  u64_str.parse::<u64>()
+    let decimal = u64_str
+        .parse::<u64>()
         .expect("failed to parse string to u64 ");
 
     return decimal;

@@ -2,7 +2,7 @@ use std::net::Ipv4Addr;
 
 pub struct IPConfig {
     pub ip_address: Ipv4Addr,
-    pub port: u16
+    pub port: u16,
 }
 
 impl From<IPConfig> for String {
@@ -14,7 +14,7 @@ impl From<IPConfig> for String {
 pub fn redis_defaults() -> String {
     let ip = IPConfig {
         ip_address: Ipv4Addr::new(127, 0, 0, 1),
-        port: 6379
+        port: 6379,
     };
     let ip_str: String = ip.into();
     return ip_str;
@@ -29,5 +29,4 @@ mod tests {
         let ip_str = redis_defaults();
         assert_eq!(ip_str, "127.0.0.1:6379");
     }
-
 }
