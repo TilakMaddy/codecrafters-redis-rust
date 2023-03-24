@@ -99,5 +99,5 @@ async fn send_response(frame: Frame, conn: &mut Connection, db: Db) {
     for group in bytes_to_write {
         conn.stream.write_all(group.as_ref()).await.unwrap();
     }
-
+    conn.stream.flush().await.unwrap();
 }
