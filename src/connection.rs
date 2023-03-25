@@ -87,17 +87,19 @@ async fn send_response(frame: Frame, conn: &mut Connection, db: Db, exp: ExpDb) 
             let key_str = key.unwrap_bulk_as_string();
 
             let mut db = db.lock().unwrap();
-            let exp = exp.lock().unwrap();
+            let mut exp = exp.lock().unwrap();
 
             if let Some(expire_time) = exp.get(&key_str) {
-                println!("{:?} found exp !", expire_time);
                 if Instant::now() >= *expire_time {
                     println!("Key has been expired !");
                     db.remove(key_str.as_str());
+                    exp.remove(key_str.as_str());
+                } else {
+                    println!("Key has not been expired !");
                 }
             }
 
-            if let Some(val) = db.get(key_str.as_str()).clone() {
+            if let Some(val) = db.get(key_str.as_str()) {
                 let len = val.len();
                 let ret_val = format!("${}\r\n", len);
                 bytes_to_write.push(ret_val.as_bytes().to_vec());
