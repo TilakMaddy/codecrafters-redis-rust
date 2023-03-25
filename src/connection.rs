@@ -78,6 +78,8 @@ async fn send_response(frame: Frame, conn: &mut Connection, db: Db, exp: ExpDb) 
                     key_str.clone(),
                     Instant::now() + Duration::from_millis(milli_seconds)
                 );
+                println!("Expire set for {} ms", milli_seconds);
+                println!("Instance {:?}", Instant::now());
             }
             let mut db = db.lock().unwrap();
             db.insert(key_str.clone(), value_bytes);
