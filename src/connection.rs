@@ -3,7 +3,7 @@ use crate::{Db, ExpDb};
 use bytes::{Buf, BytesMut};
 use std::io::Cursor;
 use std::ops::Add;
-use std::time::{Duration, SystemTime};
+use std::time::{Duration, Instant};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, BufWriter};
 use tokio::net::TcpStream;
 
@@ -76,7 +76,7 @@ async fn send_response(frame: Frame, conn: &mut Connection, db: Db, exp: ExpDb) 
                 let mut exp = exp.lock().unwrap();
                 exp.insert(
                     key_str.clone(),
-                    SystemTime::now().add(Duration::from_millis(milli_seconds)),
+                    Instant::now().add(Duration::from_millis(milli_seconds)),
                 );
             }
             let mut db = db.lock().unwrap();
@@ -91,7 +91,7 @@ async fn send_response(frame: Frame, conn: &mut Connection, db: Db, exp: ExpDb) 
             let exp = exp.lock().unwrap();
 
             if let Some(expire_time) = exp.get(&key_str) {
-                if let Ok(_diff) = SystemTime::now().duration_since(*expire_time) {
+                if Instant::now() >= *expire_time {
                     db.remove(key_str.as_str());
                 }
             }

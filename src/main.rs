@@ -3,7 +3,7 @@ use crate::connection::Connection;
 use bytes::Bytes;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use std::time::SystemTime;
+use std::time::Instant;
 use tokio::net::{TcpListener, TcpStream};
 
 mod config;
@@ -11,7 +11,7 @@ mod connection;
 mod frame;
 
 type Db = Arc<Mutex<HashMap<String, Bytes>>>;
-type ExpDb = Arc<Mutex<HashMap<String, SystemTime>>>;
+type ExpDb = Arc<Mutex<HashMap<String, Instant>>>;
 
 #[tokio::main]
 async fn main() {
