@@ -108,7 +108,7 @@ async fn send_response(frame: Frame, conn: &mut Connection, db: Db, exp: ExpDb) 
                 bytes_to_write.push(b"\r\n".to_vec());
             } else {
                 println!("Key not found in db !");
-                bytes_to_write.push(b"0\r\n\r\n".to_vec());
+                bytes_to_write.push(b"$0\r\n\r\n".to_vec());
             }
         }
         _ => panic!("command not implemented "),
