@@ -2,7 +2,6 @@ use crate::frame::Frame;
 use crate::{Db, ExpDb};
 use bytes::{Buf, BytesMut};
 use std::io::Cursor;
-use std::ops::Add;
 use std::time::{Duration, Instant};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, BufWriter};
 use tokio::net::TcpStream;
@@ -78,8 +77,6 @@ async fn send_response(frame: Frame, conn: &mut Connection, db: Db, exp: ExpDb) 
                     key_str.clone(),
                     Instant::now() + Duration::from_millis(milli_seconds)
                 );
-                println!("Expire set for {} ms", milli_seconds);
-                println!("Instance {:?}", Instant::now());
             }
             let mut db = db.lock().unwrap();
             db.insert(key_str.clone(), value_bytes);
@@ -93,7 +90,9 @@ async fn send_response(frame: Frame, conn: &mut Connection, db: Db, exp: ExpDb) 
             let exp = exp.lock().unwrap();
 
             if let Some(expire_time) = exp.get(&key_str) {
+                println!("{:?} found exp !", expire_time);
                 if Instant::now() >= *expire_time {
+                    println!("Key has been expired !");
                     db.remove(key_str.as_str());
                 }
             }
