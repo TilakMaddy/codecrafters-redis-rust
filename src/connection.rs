@@ -76,7 +76,7 @@ async fn send_response(frame: Frame, conn: &mut Connection, db: Db, exp: ExpDb) 
                 let mut exp = exp.lock().unwrap();
                 exp.insert(
                     key_str.clone(),
-                    Instant::now().add(Duration::from_millis(milli_seconds)),
+                    Instant::now() + Duration::from_millis(milli_seconds)
                 );
             }
             let mut db = db.lock().unwrap();
