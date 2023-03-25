@@ -100,12 +100,14 @@ async fn send_response(frame: Frame, conn: &mut Connection, db: Db, exp: ExpDb) 
             }
 
             if let Some(val) = db.get(key_str.as_str()) {
+                println!("Key found in db !");
                 let len = val.len();
                 let ret_val = format!("${}\r\n", len);
                 bytes_to_write.push(ret_val.as_bytes().to_vec());
                 bytes_to_write.push(val.to_vec());
                 bytes_to_write.push(b"\r\n".to_vec());
             } else {
+                println!("Key not found in db !");
                 bytes_to_write.push(b"-1\r\n".to_vec());
             }
         }
